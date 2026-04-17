@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Restaurante Cabral</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+/* ── VARIÁVEIS ── */
+:root{
+  --verde:#1A5C38;--verde-m:#2E7D50;--verde-bg:#F0F7F2;--verde-light:#E8F5ED;--verde-border:#A8D5B5;
+  --bg:#F6F4EF;--surface:#FFFFFF;--border:#E4E0D8;--border-2:#CCC8BF;
+  --text:#1A1916;--text-2:#6B6760;--text-3:#AAA79F;
+  --radius:14px;--radius-sm:9px;
+  --p-c:#1B6B3A;--p-bg:#E8F5ED;--p-b:#A8D5B5;
+  --mp-c:#0F766E;--mp-bg:#F0FDFA;--mp-b:#99F6E4;
+  --f-c:#B91C1C;--f-bg:#FEF2F2;--f-b:#FECACA;
+  --a-c:#B45309;--a-bg:#FFFBEB;--a-b:#FDE68A;
+  --g-c:#1D4ED8;--g-bg:#EFF6FF;--g-b:#BFDBFE;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text);min-height:100vh}
+.app{max-width:520px;margin:0 auto;padding-bottom:80px}
+
+/* ── HEADER ── */
+.header{background:var(--verde);padding:1rem 1.25rem .75rem;position:sticky;top:0;z-index:60}
+.hrow{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem}
+.logo{font-family:'DM Serif Display',serif;color:#fff;font-size:20px;letter-spacing:-.3px}
+.logo em{color:#9FE1CB;font-style:normal}
+.hsub{color:#9FE1CB;font-size:11px}
+.date-wrap{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.13);border-radius:var(--radius-sm);padding:6px 10px}
+.date-wrap label{color:#9FE1CB;font-size:10.5px}
+.date-wrap input[type=date]{background:transparent;border:none;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;outline:none;cursor:pointer}
+.date-wrap input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) opacity(.7)}
+
+/* ── TABS PRINCIPAIS ── */
+.main-tabs{display:flex;border-top:1px solid rgba(255,255,255,.15)}
+.main-tab{flex:1;padding:9px 4px;font-size:11px;font-weight:500;color:rgba(255,255,255,.55);text-align:center;cursor:pointer;border-bottom:2.5px solid transparent;transition:all .2s}
+.main-tab.active{color:#fff;border-bottom-color:#9FE1CB}
+
+/* ── SUB-TABS ── */
+.sub-tabs{background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;display:flex}
+.sub-tabs::-webkit-scrollbar{display:none}
+.sub-tab{padding:10px 14px;font-size:12px;font-weight:500;color:var(--text-2);cursor:pointer;border-bottom:2.5px solid transparent;white-space:nowrap;transition:all .2s;flex-shrink:0}
+.sub-tab.active{color:var(--verde);border-bottom-color:var(--verde)}
+
+/* ── PAINÉIS ── */
+.panel{display:none;padding:1rem}.panel.active{display:block}
+.slabel{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.09em;margin:1.1rem 0 .5rem}
+.slabel:first-child{margin-top:0}
+
+/* ── LOADING ── */
+.loading{display:flex;align-items:center;justify-content:center;padding:3rem;flex-direction:column;gap:12px}
+.spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--verde);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:13px;color:var(--text-3)}
+
+/* ── CARDS DE PESSOA ── */
+.pcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:11px 13px;margin-bottom:7px;transition:border-color .15s,background .15s}
+.pcard.st-p  {border-color:var(--p-b);background:var(--p-bg)}
+.pcard.st-mpm,.pcard.st-mpt{border-color:var(--mp-b);background:var(--mp-bg)}
+.pcard.st-f  {border-color:var(--f-b);background:var(--f-bg)}
+.pcard.st-a  {border-color:var(--a-b);background:var(--a-bg)}
+.pcard.st-g  {border-color:var(--g-b);background:var(--g-bg)}
+.pcard-top{display:flex;align-items:center;gap:10px}
+.av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
+.av.clt{background:#EFF6FF;color:#1D4ED8}.av.free{background:#FFFBEB;color:#B45309}
+.av.sp {background:#166534!important;color:#fff!important}
+.av.smpm,.av.smpt{background:#0F766E!important;color:#fff!important}
+.av.sf {background:#991B1B!important;color:#fff!important}
+.av.sa {background:#92400E!important;color:#fff!important}
+.av.sg {background:#1E40AF!important;color:#fff!important}
+.pname{font-size:13.5px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prole{font-size:11.5px;color:var(--text-2);margin-top:2px}
+.sbtns{display:flex;gap:4px;flex-wrap:wrap;margin-top:8px}
+.sbtn{flex:1;min-width:0;padding:6px 2px;border-radius:var(--radius-sm);border:1px solid var(--border);font-size:10.5px;font-weight:500;cursor:pointer;background:var(--bg);color:var(--text-2);text-align:center;transition:all .15s;font-family:'DM Sans',sans-serif}
+.sbtn.on-p  {background:var(--p-c);color:#fff;border-color:var(--p-c)}
+.sbtn.on-mp {background:var(--mp-c);color:#fff;border-color:var(--mp-c)}
+.sbtn.on-f  {background:var(--f-c);color:#fff;border-color:var(--f-c)}
+.sbtn.on-a  {background:var(--a-c);color:#fff;border-color:var(--a-c)}
+.sbtn.on-g  {background:var(--g-c);color:#fff;border-color:var(--g-c)}
+.mp-sub{display:none;gap:5px;margin-top:5px}.mp-sub.show{display:flex}
+.mp-opt{flex:1;padding:5px;border-radius:var(--radius-sm);border:1px solid var(--mp-b);font-size:11px;font-weight:500;cursor:pointer;background:var(--mp-bg);color:var(--mp-c);text-align:center;font-family:'DM Sans',sans-serif;transition:all .15s}
+.mp-opt.on{background:var(--mp-c);color:#fff}
+
+/* ── MÉTRICAS ── */
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:1rem 0}
+.metric{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px}
+.mlabel{font-size:10px;color:var(--text-3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.mvalue{font-size:20px;font-weight:600;color:var(--text);line-height:1}
+.mvalue.g{color:var(--p-c)}.mvalue.o{color:#B45309}.mvalue.r{color:var(--f-c)}
+
+/* ── BOTÕES ── */
+.btn-main{width:100%;padding:13px;background:var(--verde);color:#fff;border:none;border-radius:var(--radius);font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:.25rem;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-main:disabled{opacity:.5;cursor:not-allowed}
+.btn-sec{width:100%;padding:11px;background:var(--surface);color:var(--verde);border:1.5px solid var(--verde);border-radius:var(--radius);font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:.5rem;display:flex;align-items:center;justify-content:center;gap:7px}
+.btn-sm{padding:6px 12px;border-radius:var(--radius-sm);border:1px solid;font-size:11.5px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
+.btn-sm.danger{color:#B91C1C;border-color:#FECACA;background:#FEF2F2}
+.btn-sm.info{color:#1D4ED8;border-color:#BFDBFE;background:#EFF6FF}
+.btn-sm.success{color:var(--p-c);border-color:var(--p-b);background:var(--p-bg)}
+
+/* ── CARDS GERAIS ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:13px 14px;margin-bottom:8px}
+.drow{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:13px}
+.drow:last-child{border-bottom:none}
+.drow-label{color:var(--text-2)}.drow-val{font-weight:500;color:var(--text)}
+.drow-val.neg{color:var(--f-c)}.drow-val.liq{color:var(--p-c);font-size:15px;font-weight:600}
+.divider{height:1px;background:var(--border);margin:8px 0}
+
+/* ── HISTÓRICO ── */
+.hist-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:8px}
+.hist-date{font-size:12px;font-weight:600;color:var(--verde);margin-bottom:7px;display:flex;justify-content:space-between;align-items:center}
+.hist-edit{font-size:11px;color:var(--text-3);cursor:pointer;padding:3px 8px;border:1px solid var(--border);border-radius:20px;background:var(--bg)}
+.hist-row{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px}
+.hist-row:last-child{margin-bottom:0}
+.pill{display:inline-flex;padding:2px 7px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.pill.p{background:var(--p-bg);color:var(--p-c)}.pill.mp{background:var(--mp-bg);color:var(--mp-c)}
+.pill.f{background:var(--f-bg);color:var(--f-c)}.pill.a{background:var(--a-bg);color:var(--a-c)}
+.pill.g{background:var(--g-bg);color:var(--g-c)}.pill.pago{background:var(--p-bg);color:var(--p-c)}
+.pill.pendente{background:#FFFBEB;color:#B45309}
+
+/* ── FILTROS ── */
+.filter-row{display:flex;gap:8px;margin-bottom:1rem}
+.filter-row input,.filter-row select{flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--surface);outline:none}
+.filter-row input:focus,.filter-row select:focus{border-color:var(--verde)}
+
+/* ── PAINEL MENSAL ── */
+.mes-nav{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;margin-bottom:1rem}
+.mes-nav button{background:none;border:none;font-size:18px;cursor:pointer;color:var(--text-2);padding:0 6px}
+.mes-nav span{font-weight:600;font-size:14px}
+.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:1rem}
+.scard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px}.scard.full{grid-column:1/-1}
+.scard-label{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.scard-val{font-size:22px;font-weight:600;line-height:1}
+.scard-val.g{color:var(--p-c)}.scard-val.t{color:var(--mp-c)}.scard-val.r{color:var(--f-c)}.scard-val.o{color:#B45309}.scard-val.b{color:var(--g-c)}
+.pessoa-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);gap:6px}
+.pessoa-row:last-child{border-bottom:none}
+.pessoa-nome{font-size:13px;font-weight:500;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pessoa-tipo-lbl{font-size:10px;color:var(--text-3);margin-left:4px}
+.pessoa-pills{display:flex;flex-wrap:wrap;gap:3px;justify-content:flex-end}
+
+/* ── FREELANCER PAGAMENTOS ── */
+.free-pgto-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;overflow:hidden}
+.free-pgto-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px}
+.free-pgto-dias{border-top:1px solid var(--border)}
+.dia-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}
+.dia-row:last-child{border-bottom:none}
+.dia-row:hover{background:var(--bg)}
+.dia-row.selected{background:var(--p-bg)}
+.dia-check{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.dia-check.on{background:var(--p-c);border-color:var(--p-c);color:#fff}
+.dia-data{font-size:13px;font-weight:500;flex:1}
+.dia-val{font-size:13px;font-weight:600;color:var(--p-c)}
+.dia-status{font-size:11px}
+.baixa-bar{display:none;padding:12px 14px;background:var(--bg);border-top:1px solid var(--border);gap:8px;flex-wrap:wrap}
+.baixa-bar.show{display:flex}
+.baixa-bar input,.baixa-bar select{flex:1;min-width:100px;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12.5px;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--surface);outline:none}
+.baixa-bar input:focus,.baixa-bar select:focus{border-color:var(--verde)}
+
+/* ── VALES ── */
+.vale-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;overflow:hidden}
+.vale-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer}
+.vale-total-tag{font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:20px;background:var(--f-bg);color:var(--f-c)}
+.vale-body{display:none;border-top:1px solid var(--border)}
+.vale-body.open{display:block}
+.vale-item{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--border);font-size:12.5px;gap:8px}
+.vale-item:last-child{border-bottom:none}
+.vale-data{color:var(--text-3);font-size:11px;min-width:75px}
+.vale-desc{flex:1;color:var(--text)}.vale-val{font-weight:500;color:var(--f-c)}
+
+/* ── FORMULÁRIOS ── */
+.form-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:1rem}
+.form-card h3{font-size:13.5px;font-weight:600;margin-bottom:11px}
+.frow{margin-bottom:9px}
+.frow label{display:block;font-size:11.5px;font-weight:500;color:var(--text-2);margin-bottom:3px}
+.frow input,.frow select,.frow textarea{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13.5px;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--bg);outline:none}
+.frow input:focus,.frow select:focus{border-color:var(--verde)}
+.frow2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.diaria-wrap{display:none}
+
+/* ── EQUIPE ── */
+.eq-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:11px 13px;margin-bottom:7px;display:flex;align-items:center;gap:10px}
+.eq-info{flex:1;min-width:0}
+.eq-actions{display:flex;gap:5px;flex-shrink:0}
+.badge{display:inline-block;padding:1px 6px;border-radius:20px;font-size:10px;font-weight:600}
+.badge.clt{background:#EFF6FF;color:#1D4ED8}.badge.free{background:#FFFBEB;color:#B45309}
+
+/* ── MODAL ── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:flex-end;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:var(--surface);border-radius:var(--radius) var(--radius) 0 0;padding:1.25rem;width:100%;max-width:520px;max-height:88vh;overflow-y:auto}
+.modal h3{font-size:15px;font-weight:600;margin-bottom:1rem}
+.modal-btns{display:flex;gap:8px;margin-top:1rem}
+.modal-btns button{flex:1;padding:11px;border-radius:var(--radius-sm);font-size:13.5px;font-weight:600;cursor:pointer;border:1px solid var(--border);font-family:'DM Sans',sans-serif}
+.mbtn-cancel{background:var(--bg);color:var(--text-2)}
+.mbtn-save{background:var(--verde)!important;color:#fff!important;border-color:var(--verde)!important}
+.ep-pcard{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:8px}
+.ep-pname{font-size:13px;font-weight:600;margin-bottom:7px}
+.ep-btns{display:flex;gap:4px;flex-wrap:wrap}
+.ep-btn{flex:1;min-width:0;padding:6px 3px;border-radius:var(--radius-sm);border:1px solid var(--border);font-size:11px;font-weight:500;cursor:pointer;background:var(--surface);color:var(--text-2);text-align:center;font-family:'DM Sans',sans-serif;transition:all .15s;white-space:nowrap}
+.ep-btn.on-p{background:var(--p-c);color:#fff;border-color:var(--p-c)}
+.ep-btn.on-mp{background:var(--mp-c);color:#fff;border-color:var(--mp-c)}
+.ep-btn.on-f{background:var(--f-c);color:#fff;border-color:var(--f-c)}
+.ep-btn.on-a{background:var(--a-c);color:#fff;border-color:var(--a-c)}
+.ep-btn.on-g{background:var(--g-c);color:#fff;border-color:var(--g-c)}
+.ep-mp-sub{display:none;gap:4px;margin-top:5px}.ep-mp-sub.show{display:flex}
+.ep-mp-opt{flex:1;padding:5px;border-radius:var(--radius-sm);border:1px solid var(--mp-b);font-size:11px;font-weight:500;cursor:pointer;background:var(--mp-bg);color:var(--mp-c);text-align:center;font-family:'DM Sans',sans-serif;transition:all .15s}
+.ep-mp-opt.on{background:var(--mp-c);color:#fff}
+
+/* ── UTILITÁRIOS ── */
+.obs-tag{font-size:11px;color:#B45309;background:#FFFBEB;padding:3px 8px;border-radius:20px;display:inline-block;margin-top:5px}
+.empty{font-size:13px;color:var(--text-3);padding:2rem 0;text-align:center}
+.error-banner{background:#FEF2F2;border:1px solid #FECACA;border-radius:var(--radius-sm);padding:10px 14px;font-size:13px;color:#B91C1C;margin-bottom:1rem}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:#1A1916;color:#fff;padding:9px 20px;border-radius:20px;font-size:13.5px;font-weight:500;opacity:0;transition:all .3s;pointer-events:none;z-index:400;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.saving-indicator{position:fixed;top:0;left:0;right:0;height:3px;background:var(--verde);transform:scaleX(0);transform-origin:left;transition:transform .3s;z-index:500}
+.saving-indicator.active{animation:saving 1.5s ease-in-out infinite}
+@keyframes saving{0%{transform:scaleX(0)}50%{transform:scaleX(.7)}100%{transform:scaleX(1)}}
+</style>
+</head>
+<body>
+
+<div class="saving-indicator" id="saving-bar"></div>
+
+<div class="app">
+  <div class="header">
+    <div class="hrow">
+      <div><div class="logo">Cabral<em>.</em></div><div class="hsub">Gestão do restaurante</div></div>
+      <div class="date-wrap"><label>Data</label><input type="date" id="data-sel" onchange="onDataChange()"></div>
+    </div>
+    <div class="main-tabs" id="main-tabs"></div>
+  </div>
+  <div id="sub-tabs-wrap"></div>
+  <div id="panels-wrap"></div>
+</div>
+
+<!-- Modal editar colaborador -->
+<div class="modal-bg" id="modal-colab" onclick="if(event.target===this)fecharModal('modal-colab')">
+  <div class="modal">
+    <h3 id="modal-colab-title">Adicionar colaborador</h3>
+    <div class="frow2"><div class="frow"><label>Nome</label><input id="ec-nome" placeholder="Nome completo"></div><div class="frow"><label>Cargo / Função</label><input id="ec-cargo" placeholder="Ex: Garçom"></div></div>
+    <div class="frow"><label>Tipo</label><select id="ec-tipo" onchange="toggleDiariaModal()"><option value="clt">CLT — Funcionário fixo</option><option value="free">Freelancer</option></select></div>
+    <div class="frow diaria-wrap" id="ec-sal-wrap"><label>Salário / Diária (R$)</label><input id="ec-sal" type="number" placeholder="0"></div>
+    <div class="modal-btns"><button class="mbtn-cancel" onclick="fecharModal('modal-colab')">Cancelar</button><button class="mbtn-save" onclick="salvarColab()">Salvar</button></div>
+  </div>
+</div>
+
+<!-- Modal editar presença de um dia -->
+<div class="modal-bg" id="modal-pres" onclick="if(event.target===this)fecharModal('modal-pres')">
+  <div class="modal"><h3 id="mpres-title">Editar presença</h3><div id="mpres-body"></div>
+    <div class="modal-btns"><button class="mbtn-cancel" onclick="fecharModal('modal-pres')">Cancelar</button><button class="mbtn-save" onclick="salvarEdicaoPres()">Salvar</button></div>
+  </div>
+</div>
+
+<!-- Modal registrar vale -->
+<div class="modal-bg" id="modal-vale" onclick="if(event.target===this)fecharModal('modal-vale')">
+  <div class="modal">
+    <h3>Registrar vale</h3>
+    <div class="frow"><label>Colaborador</label><select id="vale-pessoa"></select></div>
+    <div class="frow2"><div class="frow"><label>Data</label><input type="date" id="vale-data"></div><div class="frow"><label>Valor (R$)</label><input type="number" id="vale-val" placeholder="0"></div></div>
+    <div class="frow"><label>Produto / Tipo</label><input id="vale-prod" placeholder="Ex: PIX, Cerveja, Almoço..."></div>
+    <div class="modal-btns"><button class="mbtn-cancel" onclick="fecharModal('modal-vale')">Cancelar</button><button class="mbtn-save" onclick="confirmarVale()">Registrar</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ╔══════════════════════════════════════════════════════════╗
+// ║  CONFIGURAÇÃO — ALTERE APENAS ESTA LINHA                 ║
+// ╚══════════════════════════════════════════════════════════╝
+const API_URL = 'https://script.google.com/macros/s/AKfycbyujeHoX05aQDiijVcasUWoOu4jvYCwDLMs4zEagnBY-ICX1zXgjo_-QwnwQ_FLQRl8/exec';
+
+// ── ESTADO GLOBAL ────────────────────────────────────────────
+const STATE = {
+  colaboradores: [],
+  presencaHoje: {},      // { colaborador_id: { status, turno } }
+  presencaCache: {},     // { 'YYYY-MM-DD': { colaborador_id: {...} } }
+  pagamentosPendentes: {},  // { colaborador_id: [{ id, data_trabalho, diaria }] }
+  valesCache: {},        // { 'YYYY-MM': { nome: [items] } }
+  salariosCache: {},     // { 'YYYY-MM': { nome: {...} } }
+  activeMain: 'presenca',
+  activeSub: { presenca: 'hoje', salarios: 'sal-clt', equipe: 'equipe-lista' },
+  editColabId: null,
+  editPresData: null,
+  editPresTemp: {},
+  painelMes: new Date().toISOString().slice(0,7),
+  selectedDiasPgto: {},  // { colaborador_id: Set(ids) }
+};
+
+// ── UTILITÁRIOS ───────────────────────────────────────────────
+const fmt  = n => 'R$' + Math.round(n||0).toLocaleString('pt-BR');
+const hoje = () => new Date().toISOString().split('T')[0];
+const mesOf = d => d.slice(0,7);
+const initials = n => n.trim().split(' ').filter(Boolean).map(x=>x[0]).join('').slice(0,2).toUpperCase();
+const mesNome  = ym => { const[y,m]=ym.split('-'); return new Date(+y,+m-1,1).toLocaleDateString('pt-BR',{month:'long',year:'numeric'}); };
+const mesNomeCurto = ym => { const[y,m]=ym.split('-'); return new Date(+y,+m-1,1).toLocaleDateString('pt-BR',{month:'short'}).replace('.','').toUpperCase(); };
+
+function getDataSel() { return document.getElementById('data-sel').value || hoje(); }
+
+function showToast(msg, tipo='ok') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = tipo === 'erro' ? '#B91C1C' : '#1A1916';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function setSaving(on) {
+  document.getElementById('saving-bar').classList.toggle('active', on);
+}
+
+function fecharModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ── API ───────────────────────────────────────────────────────
+async function apiGet(action, params = {}) {
+  const url = new URL(API_URL);
+  url.searchParams.set('action', action);
+  Object.entries(params).forEach(([k,v]) => url.searchParams.set(k, v));
+  const res = await fetch(url.toString());
+  const data = await res.json();
+  if (!data.ok) throw new Error(data.error || 'Erro na API');
+  return data.data;
+}
+
+async function apiPost(action, payload = {}) {
+  const res = await fetch(API_URL, {
+    method: 'POST',
+    body: JSON.stringify({ action, data: payload }),
+  });
+  const data = await res.json();
+  if (!data.ok) throw new Error(data.error || 'Erro na API');
+  return data;
+}
+
+// ── INICIALIZAÇÃO ─────────────────────────────────────────────
+async function init() {
+  document.getElementById('data-sel').value = hoje();
+
+  // Verificar se URL foi configurada
+  if (API_URL === 'COLE_AQUI_A_URL_DO_SEU_APPS_SCRIPT') {
+    renderConfiguracaoPendente();
+    return;
+  }
+
+  try {
+    await apiGet('inicializar');
+    const colabs = await apiGet('getColaboradores');
+    STATE.colaboradores = colabs || [];
+    buildUI();
+    await carregarPresencaHoje();
+  } catch(err) {
+    renderErroConexao(err.message);
+  }
+}
+
+function renderConfiguracaoPendente() {
+  document.getElementById('panels-wrap').innerHTML = `
+    <div style="padding:1.5rem">
+      <div class="error-banner">
+        <strong>Configuração necessária</strong><br>
+        Substitua <code>COLE_AQUI_A_URL_DO_SEU_APPS_SCRIPT</code> no código pelo URL do seu Apps Script.<br><br>
+        Siga o passo a passo no documento de instruções.
+      </div>
+    </div>`;
+}
+
+function renderErroConexao(msg) {
+  document.getElementById('panels-wrap').innerHTML = `
+    <div style="padding:1.5rem">
+      <div class="error-banner">
+        <strong>Erro de conexão</strong><br>${msg}<br><br>
+        Verifique se o URL do Apps Script está correto e se a implantação está ativa.
+      </div>
+    </div>`;
+}
+
+// ── ESTRUTURA DE NAVEGAÇÃO ────────────────────────────────────
+const NAV = {
+  presenca: {
+    label: 'Presença',
+    subs: [
+      { id: 'hoje',      label: 'Hoje' },
+      { id: 'historico', label: 'Histórico' },
+      { id: 'painel',    label: 'Painel' },
+      { id: 'equipe',    label: 'Equipe' },
+      { id: 'freelancers', label: 'Freelancers' },
+      { id: 'pgto-free', label: 'Pagamentos' },
+    ],
+  },
+  salarios: {
+    label: 'Salários',
+    subs: [
+      { id: 'sal-clt',   label: 'Salários CLT' },
+      { id: 'sal-vales', label: 'Vales' },
+    ],
+  },
+};
+
+function buildUI() {
+  // Main tabs
+  const mainTabsEl = document.getElementById('main-tabs');
+  mainTabsEl.innerHTML = Object.entries(NAV).map(([id, cfg]) =>
+    `<div class="main-tab ${STATE.activeMain===id?'active':''}" onclick="setMain('${id}')">${cfg.label}</div>`
+  ).join('');
+
+  // Panels wrapper
+  const allSubs = Object.values(NAV).flatMap(cfg => cfg.subs);
+  document.getElementById('panels-wrap').innerHTML = allSubs.map(s =>
+    `<div class="panel" id="panel-${s.id}"></div>`
+  ).join('');
+
+  renderSubTabs();
+  ativarPanel(STATE.activeSub[STATE.activeMain]);
+}
+
+function renderSubTabs() {
+  const subs = NAV[STATE.activeMain].subs;
+  const activeSub = STATE.activeSub[STATE.activeMain];
+  document.getElementById('sub-tabs-wrap').innerHTML =
+    `<div class="sub-tabs">${subs.map(s =>
+      `<div class="sub-tab ${activeSub===s.id?'active':''}" onclick="setSub('${s.id}')">${s.label}</div>`
+    ).join('')}</div>`;
+}
+
+function setMain(id) {
+  STATE.activeMain = id;
+  document.querySelectorAll('.main-tab').forEach((el,i) =>
+    el.classList.toggle('active', Object.keys(NAV)[i] === id));
+  renderSubTabs();
+  ativarPanel(STATE.activeSub[id]);
+}
+
+function setSub(id) {
+  STATE.activeSub[STATE.activeMain] = id;
+  renderSubTabs();
+  ativarPanel(id);
+}
+
+function ativarPanel(id) {
+  document.querySelectorAll('.panel').forEach(el => el.classList.remove('active'));
+  const p = document.getElementById('panel-' + id);
+  if (p) p.classList.add('active');
+  renderPanel(id);
+}
+
+function onDataChange() {
+  if (STATE.activeSub[STATE.activeMain] === 'hoje') renderHoje();
+}
+
+// ── PRESENÇA — HOJE ───────────────────────────────────────────
+async function carregarPresencaHoje() {
+  try {
+    const dia = getDataSel();
+    const registros = await apiGet('getPresenca', { data: dia });
+    STATE.presencaHoje = {};
+    (registros || []).forEach(r => {
+      STATE.presencaHoje[r.colaborador_id] = { status: r.status, turno: r.turno };
+    });
+    if (STATE.activeSub[STATE.activeMain] === 'hoje') renderHoje();
+  } catch(err) {
+    showToast('Erro ao carregar presença', 'erro');
+  }
+}
+
+function renderPanel(id) {
+  if (id === 'hoje')       renderHoje();
+  else if (id === 'historico') renderHistorico();
+  else if (id === 'painel')    renderPainel();
+  else if (id === 'equipe')    renderEquipe();
+  else if (id === 'freelancers') renderFreelancers();
+  else if (id === 'pgto-free') renderPgtoFree();
+  else if (id === 'sal-clt')   renderSalCLT();
+  else if (id === 'sal-vales') renderVales();
+}
+
+function buildPCard(p) {
+  const reg = STATE.presencaHoje[p.id] || {};
+  const est = reg.status || '';
+  const isMp = est === 'mpm' || est === 'mpt';
+  const avSt = est ? 's' + est : '';
+  const cardCls = est ? (isMp ? 'st-mpm' : 'st-' + est) : '';
+  const sub = p.tipo === 'free' ? `${p.cargo} · ${fmt(p.sal)}/dia` : p.cargo;
+  const btns = [
+    {k:'p', l:'Presente'}, {k:'mp', l:'Meio Per.'},
+    {k:'f', l:'Falta'},    {k:'a',  l:'Atestado'}, {k:'g', l:'Folga'},
+  ].map(b => {
+    const on = b.k === 'mp' ? isMp : est === b.k;
+    return `<button class="sbtn ${on ? 'on-' + b.k : ''}" onclick="toggleSt('${p.id}','${b.k}')">${b.l}</button>`;
+  }).join('');
+  return `<div class="pcard ${cardCls}" id="pcard-${p.id}">
+    <div class="pcard-top">
+      <div class="av ${p.tipo} ${avSt}">${initials(p.nome)}</div>
+      <div style="flex:1;min-width:0"><div class="pname">${p.nome}</div><div class="prole">${sub}</div></div>
+    </div>
+    <div class="sbtns">${btns}</div>
+    <div class="mp-sub ${isMp ? 'show' : ''}" id="mp-${p.id}">
+      <button class="mp-opt ${est==='mpm'?'on':''}" onclick="setMp('${p.id}','mpm')">Manhã</button>
+      <button class="mp-opt ${est==='mpt'?'on':''}" onclick="setMp('${p.id}','mpt')">Tarde</button>
+    </div>
+  </div>`;
+}
+
+function renderHoje() {
+  const panel = document.getElementById('panel-hoje');
+  if (!panel) return;
+  const dia = getDataSel();
+  const clt = STATE.colaboradores.filter(c => c.tipo === 'clt');
+  const free = STATE.colaboradores.filter(c => c.tipo === 'free');
+  const ph = STATE.presencaHoje;
+  const cltP = clt.filter(c => ph[c.id]?.status === 'p').length;
+  const freeP = free.filter(c => ph[c.id]?.status === 'p');
+  const custoDia = freeP.reduce((s, c) => s + (Number(c.sal) || 0), 0);
+
+  panel.innerHTML = `
+    <div class="slabel">CLT</div>
+    ${clt.length ? clt.map(buildPCard).join('') : '<p class="empty">Nenhum CLT cadastrado.</p>'}
+    <div class="slabel">Freelancers</div>
+    ${free.length ? free.map(buildPCard).join('') : '<p class="empty">Nenhum freelancer cadastrado.</p>'}
+    <div class="sgrid">
+      <div class="metric"><div class="mlabel">CLT presentes</div><div class="mvalue g">${cltP}/${clt.length}</div></div>
+      <div class="metric"><div class="mlabel">Freelancers</div><div class="mvalue g">${freeP.length}/${free.length}</div></div>
+      <div class="metric"><div class="mlabel">Custo free hoje</div><div class="mvalue o">${fmt(custoDia)}</div></div>
+      <div class="metric"><div class="mlabel">Registros hoje</div><div class="mvalue">${Object.keys(ph).length}</div></div>
+    </div>
+    <button class="btn-main" id="btn-salvar" onclick="salvarPresenca()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      Salvar presença
+    </button>`;
+}
+
+function toggleSt(id, key) {
+  const cur = STATE.presencaHoje[id]?.status || '';
+  const isMp = cur === 'mpm' || cur === 'mpt';
+  if (key === 'mp') {
+    if (isMp) delete STATE.presencaHoje[id];
+    else STATE.presencaHoje[id] = { status: 'mpm', turno: 'manha' };
+  } else {
+    if (cur === key) delete STATE.presencaHoje[id];
+    else STATE.presencaHoje[id] = { status: key, turno: '' };
+  }
+  // Re-renderiza só o card afetado
+  const colabs = STATE.colaboradores.find(c => String(c.id) === String(id));
+  if (colabs) {
+    const el = document.getElementById('pcard-' + id);
+    if (el) el.outerHTML = buildPCard(colabs);
+  }
+}
+
+function setMp(id, val) {
+  STATE.presencaHoje[id] = { status: val, turno: val === 'mpm' ? 'manha' : 'tarde' };
+  const colabs = STATE.colaboradores.find(c => String(c.id) === String(id));
+  if (colabs) {
+    const el = document.getElementById('pcard-' + id);
+    if (el) el.outerHTML = buildPCard(colabs);
+  }
+}
+
+async function salvarPresenca() {
+  const btn = document.getElementById('btn-salvar');
+  if (btn) btn.disabled = true;
+  setSaving(true);
+  try {
+    const dia = getDataSel();
+    const registros = STATE.colaboradores.map(c => ({
+      colaborador_id:   String(c.id),
+      colaborador_nome: c.nome,
+      data:             dia,
+      status:           STATE.presencaHoje[c.id]?.status || '',
+      turno:            STATE.presencaHoje[c.id]?.turno || '',
+      tipo:             c.tipo,
+      diaria:           c.tipo === 'free' ? (c.sal || 0) : 0,
+    })).filter(r => r.status); // só envia quem tem status marcado
+
+    await apiPost('salvarPresenca', { registros });
+    showToast('Presença salva!');
+    await carregarPresencaHoje();
+  } catch(err) {
+    showToast('Erro ao salvar: ' + err.message, 'erro');
+  } finally {
+    setSaving(false);
+    if (btn) btn.disabled = false;
+  }
+}
+
+// ── PRESENÇA — HISTÓRICO ──────────────────────────────────────
+async function renderHistorico() {
+  const panel = document.getElementById('panel-historico');
+  if (!panel) return;
+  panel.innerHTML = `<div class="loading"><div class="spinner"></div><span class="loading-text">Carregando histórico...</span></div>`;
+  try {
+    const mesAtual = mesOf(getDataSel());
+    const registros = await apiGet('getPresenca', { mes_ano: mesAtual });
+    // Agrupar por data
+    const porData = {};
+    (registros || []).forEach(r => {
+      if (!porData[r.data]) porData[r.data] = [];
+      porData[r.data].push(r);
+    });
+    const dias = Object.keys(porData).sort().reverse();
+    if (!dias.length) { panel.innerHTML = '<p class="empty">Nenhum registro neste mês.</p>'; return; }
+
+    const SL = {p:'Presente',mpm:'Meio Manhã',mpt:'Meio Tarde',f:'Falta',a:'Atestado',g:'Folga'};
+    panel.innerHTML = `
+      <div class="filter-row">
+        <input type="month" id="hist-mes" value="${mesAtual}" onchange="renderHistorico()">
+      </div>` +
+      dias.map(d => {
+        const regs = porData[d];
+        const grupos = {p:[],mpm:[],mpt:[],f:[],a:[],g:[]};
+        regs.forEach(r => { if(grupos[r.status]) grupos[r.status].push(r.colaborador_nome?.split(' ')[0]); });
+        const custo = regs.filter(r => {
+          const c = STATE.colaboradores.find(x => String(x.id) === String(r.colaborador_id));
+          return c?.tipo === 'free' && r.status === 'p';
+        }).reduce((s, r) => {
+          const c = STATE.colaboradores.find(x => String(x.id) === String(r.colaborador_id));
+          return s + (Number(c?.sal)||0);
+        }, 0);
+        const dtLabel = new Date(d+'T12:00:00').toLocaleDateString('pt-BR',{weekday:'short',day:'numeric',month:'short'});
+        let rows = '';
+        Object.entries(grupos).forEach(([k, nomes]) => {
+          if (nomes.length) rows += `<div class="hist-row"><div><span class="pill ${k.startsWith('mp')?'mp':k}">${SL[k]}</span> ${nomes.join(', ')}</div>${k==='p'&&custo?`<span style="font-weight:600;color:var(--p-c)">${fmt(custo)}</span>`:''}</div>`;
+        });
+        if (!rows) rows = '<div class="hist-row" style="color:var(--text-3)">Sem registros</div>';
+        return `<div class="hist-card">
+          <div class="hist-date">${dtLabel}<span class="hist-edit" onclick="abrirEdicaoPres('${d}')">Editar</span></div>
+          ${rows}
+        </div>`;
+      }).join('');
+  } catch(err) {
+    panel.innerHTML = `<div class="error-banner">Erro ao carregar histórico: ${err.message}</div>`;
+  }
+}
+
+async function abrirEdicaoPres(dia) {
+  STATE.editPresData = dia;
+  try {
+    const registros = await apiGet('getPresenca', { data: dia });
+    STATE.editPresTemp = {};
+    (registros || []).forEach(r => {
+      STATE.editPresTemp[r.colaborador_id] = { status: r.status, turno: r.turno };
+    });
+    const dtLabel = new Date(dia+'T12:00:00').toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    document.getElementById('mpres-title').textContent = dtLabel;
+    document.getElementById('mpres-body').innerHTML = STATE.colaboradores.map(p => {
+      const est = STATE.editPresTemp[p.id]?.status || '';
+      const isMp = est === 'mpm' || est === 'mpt';
+      const btns = [
+        {k:'p',l:'Presente'},{k:'mp',l:'Meio Per.'},{k:'f',l:'Falta'},{k:'a',l:'Atestado'},{k:'g',l:'Folga'}
+      ].map(b => {
+        const on = b.k === 'mp' ? isMp : est === b.k;
+        return `<button class="ep-btn ${on?'on-'+b.k:''}" id="epb-${p.id}-${b.k}" onclick="epToggle('${p.id}','${b.k}')">${b.l}</button>`;
+      }).join('');
+      return `<div class="ep-pcard">
+        <div class="ep-pname">${p.nome} <span style="font-size:10px;color:var(--text-3);font-weight:400">${p.cargo}</span></div>
+        <div class="ep-btns">${btns}</div>
+        <div class="ep-mp-sub ${isMp?'show':''}" id="ep-mp-${p.id}">
+          <button class="ep-mp-opt ${est==='mpm'?'on':''}" id="ep-mpm-${p.id}" onclick="epSetMp('${p.id}','mpm')">Manhã</button>
+          <button class="ep-mp-opt ${est==='mpt'?'on':''}" id="ep-mpt-${p.id}" onclick="epSetMp('${p.id}','mpt')">Tarde</button>
+        </div>
+      </div>`;
+    }).join('');
+    document.getElementById('modal-pres').classList.add('open');
+  } catch(err) {
+    showToast('Erro ao abrir edição', 'erro');
+  }
+}
+
+function epToggle(id, key) {
+  const cur = STATE.editPresTemp[id]?.status || '';
+  const isMp = cur === 'mpm' || cur === 'mpt';
+  if (key === 'mp') { STATE.editPresTemp[id] = isMp ? {} : {status:'mpm',turno:'manha'}; }
+  else { STATE.editPresTemp[id] = cur === key ? {} : {status:key,turno:''}; }
+  const est = STATE.editPresTemp[id]?.status || '';
+  const nm = est === 'mpm' || est === 'mpt';
+  ['p','mp','f','a','g'].forEach(k => {
+    const b = document.getElementById(`epb-${id}-${k}`);
+    if (b) b.className = `ep-btn ${(k==='mp'?nm:est===k)?'on-'+k:''}`;
+  });
+  const sub = document.getElementById(`ep-mp-${id}`);
+  if (sub) sub.className = `ep-mp-sub ${nm?'show':''}`;
+  ['mpm','mpt'].forEach(v => { const b = document.getElementById(`ep-${v}-${id}`); if(b) b.className=`ep-mp-opt ${est===v?'on':''}`; });
+}
+
+function epSetMp(id, val) {
+  STATE.editPresTemp[id] = { status: val, turno: val === 'mpm' ? 'manha' : 'tarde' };
+  ['mpm','mpt'].forEach(v => { const b = document.getElementById(`ep-${v}-${id}`); if(b) b.className=`ep-mp-opt ${val===v?'on':''}`; });
+}
+
+async function salvarEdicaoPres() {
+  if (!STATE.editPresData) return;
+  setSaving(true);
+  try {
+    const registros = STATE.colaboradores.map(c => ({
+      colaborador_id: String(c.id), colaborador_nome: c.nome,
+      data: STATE.editPresData,
+      status: STATE.editPresTemp[c.id]?.status || '',
+      turno:  STATE.editPresTemp[c.id]?.turno  || '',
+      tipo: c.tipo, diaria: c.tipo === 'free' ? (c.sal || 0) : 0,
+    })).filter(r => r.status);
+    await apiPost('salvarPresenca', { registros });
+    fecharModal('modal-pres');
+    renderHistorico();
+    showToast('Presença atualizada!');
+  } catch(err) {
+    showToast('Erro: ' + err.message, 'erro');
+  } finally { setSaving(false); }
+}
+
+// ── PAINEL ─────────────────────────────────────────────────────
+async function renderPainel() {
+  const panel = document.getElementById('panel-painel');
+  if (!panel) return;
+  panel.innerHTML = `<div class="loading"><div class="spinner"></div><span class="loading-text">Calculando indicadores...</span></div>`;
+  try {
+    const registros = await apiGet('getPresenca', { mes_ano: STATE.painelMes });
+    const stats = {};
+    STATE.colaboradores.forEach(c => { stats[c.id] = {p:0,mp:0,f:0,a:0,g:0,custo:0,nome:c.nome,tipo:c.tipo}; });
+    (registros || []).forEach(r => {
+      if (!stats[r.colaborador_id]) return;
+      const s = r.status;
+      if (s === 'mpm' || s === 'mpt') stats[r.colaborador_id].mp++;
+      else if (s) stats[r.colaborador_id][s] = (stats[r.colaborador_id][s]||0) + 1;
+      const c = STATE.colaboradores.find(x => String(x.id) === String(r.colaborador_id));
+      if (c?.tipo === 'free' && s === 'p') stats[r.colaborador_id].custo += Number(c.sal)||0;
+    });
+    const sums = k => Object.values(stats).reduce((s,x)=>s+(x[k]||0),0);
+    const custoFree = Object.values(stats).filter(x=>x.tipo==='free').reduce((s,x)=>s+x.custo,0);
+
+    panel.innerHTML = `
+      <div class="mes-nav">
+        <button onclick="mudarMesPainel(-1)">&#8592;</button>
+        <span>${mesNome(STATE.painelMes)}</span>
+        <button onclick="mudarMesPainel(1)">&#8594;</button>
+      </div>
+      <div class="stat-grid">
+        <div class="scard"><div class="scard-label">Presenças totais</div><div class="scard-val g">${sums('p')}</div></div>
+        <div class="scard"><div class="scard-label">Meio período</div><div class="scard-val t">${sums('mp')}</div></div>
+        <div class="scard"><div class="scard-label">Faltas</div><div class="scard-val r">${sums('f')}</div></div>
+        <div class="scard"><div class="scard-label">Atestados</div><div class="scard-val o">${sums('a')}</div></div>
+        <div class="scard"><div class="scard-label">Folgas</div><div class="scard-val b">${sums('g')}</div></div>
+        <div class="scard"><div class="scard-label">Custo freelancers</div><div class="scard-val g">${fmt(custoFree)}</div></div>
+      </div>
+      <div class="slabel">Dias por colaborador</div>
+      ${STATE.colaboradores.map(c => {
+        const s = stats[c.id] || {};
+        let pills = `<span class="pill p">${s.p||0}P</span>`;
+        if(s.mp) pills += ` <span class="pill mp">${s.mp}MP</span>`;
+        if(s.f)  pills += ` <span class="pill f">${s.f}F</span>`;
+        if(s.a)  pills += ` <span class="pill a">${s.a}At</span>`;
+        if(s.g)  pills += ` <span class="pill g">${s.g}Fg</span>`;
+        return `<div class="pessoa-row">
+          <div class="pessoa-nome">${c.nome}<span class="pessoa-tipo-lbl">${c.tipo==='clt'?'CLT':'Free'}</span></div>
+          <div class="pessoa-pills">${pills}</div>
+        </div>`;
+      }).join('')}`;
+  } catch(err) {
+    panel.innerHTML = `<div class="error-banner">Erro: ${err.message}</div>`;
+  }
+}
+
+function mudarMesPainel(d) {
+  const[y,m] = STATE.painelMes.split('-').map(Number);
+  const dt = new Date(y, m-1+d, 1);
+  STATE.painelMes = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}`;
+  renderPainel();
+}
+
+// ── EQUIPE ─────────────────────────────────────────────────────
+function renderEquipe() {
+  const panel = document.getElementById('panel-equipe-lista');
+  if (!panel) return;
+  const clt = STATE.colaboradores.filter(c => c.tipo === 'clt');
+  panel.innerHTML = `
+    <button class="btn-main" onclick="abrirModalColab(null)" style="margin-bottom:1rem">+ Adicionar colaborador</button>
+    <div class="slabel">CLT — Funcionários fixos</div>
+    ${clt.length ? clt.map(renderEqCard).join('') : '<p class="empty">Nenhum CLT cadastrado.</p>'}`;
+}
+
+function renderFreelancers() {
+  const panel = document.getElementById('panel-freelancers');
+  if (!panel) return;
+  const free = STATE.colaboradores.filter(c => c.tipo === 'free');
+  panel.innerHTML = `
+    <button class="btn-main" onclick="abrirModalColab(null, 'free')" style="margin-bottom:1rem">+ Adicionar freelancer</button>
+    <div class="slabel">Freelancers cadastrados</div>
+    ${free.length ? free.map(renderEqCard).join('') : '<p class="empty">Nenhum freelancer cadastrado.</p>'}`;
+}
+
+function renderEqCard(c) {
+  const sub = c.tipo === 'free' ? `${c.cargo} · ${fmt(c.sal)}/dia` : c.cargo;
+  return `<div class="eq-card">
+    <div class="av ${c.tipo}">${initials(c.nome)}</div>
+    <div class="eq-info">
+      <div class="pname">${c.nome}</div>
+      <div class="prole"><span class="badge ${c.tipo}">${c.tipo==='clt'?'CLT':'Freelancer'}</span> ${sub}</div>
+    </div>
+    <div class="eq-actions">
+      <button class="btn-sm info" onclick="abrirModalColab('${c.id}')">Editar</button>
+      <button class="btn-sm danger" onclick="removerColab('${c.id}')">Remover</button>
+    </div>
+  </div>`;
+}
+
+function abrirModalColab(id, tipoDefault = 'clt') {
+  STATE.editColabId = id;
+  const c = id ? STATE.colaboradores.find(x => String(x.id) === String(id)) : null;
+  document.getElementById('modal-colab-title').textContent = c ? 'Editar colaborador' : 'Adicionar colaborador';
+  document.getElementById('ec-nome').value  = c?.nome  || '';
+  document.getElementById('ec-cargo').value = c?.cargo || '';
+  document.getElementById('ec-tipo').value  = c?.tipo  || tipoDefault;
+  document.getElementById('ec-sal').value   = c?.sal   || '';
+  document.getElementById('ec-sal-wrap').style.display = 'block';
+  document.getElementById('modal-colab').classList.add('open');
+}
+
+function toggleDiariaModal() { /* sempre mostra salário */ }
+
+async function salvarColab() {
+  const nome  = document.getElementById('ec-nome').value.trim();
+  const cargo = document.getElementById('ec-cargo').value.trim();
+  const tipo  = document.getElementById('ec-tipo').value;
+  const sal   = parseFloat(document.getElementById('ec-sal').value) || 0;
+  if (!nome) { showToast('Informe o nome', 'erro'); return; }
+  setSaving(true);
+  try {
+    const payload = { nome, cargo: cargo || 'Colaborador', tipo, sal };
+    if (STATE.editColabId) payload.id = STATE.editColabId;
+    const res = await apiPost('salvarColaborador', payload);
+    // Atualiza cache local
+    if (STATE.editColabId) {
+      const idx = STATE.colaboradores.findIndex(c => String(c.id) === String(STATE.editColabId));
+      if (idx > -1) STATE.colaboradores[idx] = { ...STATE.colaboradores[idx], ...payload };
+    } else {
+      STATE.colaboradores.push({ id: res.data?.id || Date.now(), ...payload });
+    }
+    fecharModal('modal-colab');
+    renderEquipe();
+    renderFreelancers();
+    showToast(STATE.editColabId ? 'Colaborador atualizado!' : 'Colaborador adicionado!');
+  } catch(err) {
+    showToast('Erro: ' + err.message, 'erro');
+  } finally { setSaving(false); }
+}
+
+async function removerColab(id) {
+  if (!confirm('Remover colaborador? O histórico de presença será mantido.')) return;
+  setSaving(true);
+  try {
+    await apiPost('removerColaborador', { id });
+    STATE.colaboradores = STATE.colaboradores.filter(c => String(c.id) !== String(id));
+    renderEquipe();
+    renderFreelancers();
+    showToast('Colaborador removido.');
+  } catch(err) {
+    showToast('Erro: ' + err.message, 'erro');
+  } finally { setSaving(false); }
+}
+
+// ── PAGAMENTO DE FREELANCERS ───────────────────────────────────
+async function renderPgtoFree() {
+  const panel = document.getElementById('panel-pgto-free');
+  if (!panel) return;
+  panel.innerHTML = `<div class="loading"><div class="spinner"></div><span class="loading-text">Carregando pagamentos...</span></div>`;
+  try {
+    const free = STATE.colaboradores.filter(c => c.tipo === 'free');
+    if (!free.length) { panel.innerHTML = '<p class="empty">Nenhum freelancer cadastrado.</p>'; return; }
+
+    const todosPendentes = await apiGet('getPagamentos', { status: 'pendente' });
+    const todosPagos     = await apiGet('getPagamentos', { status: 'pago' });
+
+    panel.innerHTML = free.map(f => {
+      const pendentes = (todosPendentes || []).filter(p => String(p.colaborador_id) === String(f.id));
+      const pagos     = (todosPagos     || []).filter(p => String(p.colaborador_id) === String(f.id)).slice(0, 10);
+      const totalPendente = pendentes.reduce((s, p) => s + (Number(p.diaria)||0), 0);
+      const selecionados  = STATE.selectedDiasPgto[f.id] || new Set();
+
+      const diasHtml = pendentes.length ? pendentes.map(p => {
+        const dt = new Date(p.data_trabalho+'T12:00:00').toLocaleDateString('pt-BR',{weekday:'short',day:'numeric',month:'short'});
+        const sel = selecionados.has(p.id);
+        return `<div class="dia-row ${sel?'selected':''}" onclick="toggleDiaSel('${f.id}','${p.id}')">
+          <div class="dia-check ${sel?'on':''}">✓</div>
+          <div class="dia-data">${dt}</div>
+          <div class="dia-val">${fmt(p.diaria)}</div>
+          <span class="pill pendente">Pendente</span>
+        </div>`;
+      }).join('') : `<div style="padding:12px 14px;font-size:13px;color:var(--text-3)">Nenhum pagamento pendente.</div>`;
+
+      const histHtml = pagos.length ? `
+        <div style="padding:12px 14px;border-top:1px solid var(--border)">
+          <div class="slabel" style="margin:0 0 8px">Pagamentos realizados</div>
+          ${pagos.map(p => {
+            const dt = new Date(p.data_trabalho+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'short'});
+            const dtPgto = p.data_pagamento ? new Date(p.data_pagamento+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}) : '—';
+            return `<div class="hist-row"><div><span class="pill pago">Pago</span> ${dt} · ${p.forma_pagamento||'—'}</div><div style="font-weight:600;color:var(--p-c)">${fmt(p.diaria)}</div></div>`;
+          }).join('')}
+        </div>` : '';
+
+      return `<div class="free-pgto-card">
+        <div class="free-pgto-header">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="av free">${initials(f.nome)}</div>
+            <div><div class="pname">${f.nome}</div><div class="prole">${f.cargo} · ${fmt(f.sal)}/dia</div></div>
+          </div>
+          <div>
+            ${totalPendente > 0 ? `<span class="pill pendente">${fmt(totalPendente)}</span>` : '<span class="pill pago">Em dia</span>'}
+          </div>
+        </div>
+        <div class="free-pgto-dias">${diasHtml}</div>
+        <div class="baixa-bar ${selecionados.size>0?'show':''}" id="baixa-${f.id}">
+          <select id="forma-${f.id}">
+            <option value="pix">Pix</option>
+            <option value="dinheiro">Dinheiro</option>
+            <option value="outro">Outro</option>
+          </select>
+          <input type="date" id="dtpgto-${f.id}" value="${hoje()}">
+          <button class="btn-sm success" onclick="confirmarBaixa('${f.id}')">
+            Pagar ${selecionados.size} dia${selecionados.size!==1?'s':''}
+          </button>
+        </div>
+        ${histHtml}
+      </div>`;
+    }).join('');
+  } catch(err) {
+    panel.innerHTML = `<div class="error-banner">Erro: ${err.message}</div>`;
+  }
+}
+
+function toggleDiaSel(freelancerId, pgtoId) {
+  if (!STATE.selectedDiasPgto[freelancerId]) STATE.selectedDiasPgto[freelancerId] = new Set();
+  const set = STATE.selectedDiasPgto[freelancerId];
+  if (set.has(pgtoId)) set.delete(pgtoId); else set.add(pgtoId);
+  renderPgtoFree();
+}
+
+async function confirmarBaixa(freelancerId) {
+  const ids = [...(STATE.selectedDiasPgto[freelancerId] || new Set())];
+  if (!ids.length) { showToast('Selecione ao menos um dia', 'erro'); return; }
+  const forma = document.getElementById(`forma-${freelancerId}`)?.value;
+  const data  = document.getElementById(`dtpgto-${freelancerId}`)?.value || hoje();
+  setSaving(true);
+  try {
+    const res = await apiPost('darBaixaPagamento', { ids, forma_pagamento: forma, data_pagamento: data });
+    STATE.selectedDiasPgto[freelancerId] = new Set();
+    showToast(`${res.total_baixados} pagamento(s) confirmado(s)!`);
+    renderPgtoFree();
+  } catch(err) {
+    showToast('Erro: ' + err.message, 'erro');
+  } finally { setSaving(false); }
+}
+
+// ── SALÁRIOS CLT ───────────────────────────────────────────────
+async function renderSalCLT() {
+  const panel = document.getElementById('panel-sal-clt');
+  if (!panel) return;
+  panel.innerHTML = `<div class="loading"><div class="spinner"></div><span class="loading-text">Carregando salários...</span></div>`;
+  try {
+    const mesAtual = mesOf(hoje());
+    const clt = STATE.colaboradores.filter(c => c.tipo === 'clt');
+    // Busca vales do mês atual para calcular líquido estimado
+    const vales = await apiGet('getVales', { mes_ano: mesAtual });
+    const salarios = await apiGet('getSalarios', { mes_ano: mesAtual });
+
+    panel.innerHTML = `
+      <button class="btn-sec" onclick="abrirModalVale()" style="margin-bottom:1rem">+ Registrar vale</button>
+      ${clt.map(c => {
+        const valesC = (vales||[]).filter(v => v.colaborador_nome === c.nome);
+        const totalVales = valesC.reduce((s,v)=>s+(Number(v.valor)||0),0);
+        const salHist = (salarios||[]).find(s => s.colaborador_nome === c.nome);
+        const bruto = salHist ? Number(salHist.bruto) : Number(c.sal)||0;
+        const liq = bruto - totalVales;
+        return `<div class="card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <div class="av clt">${initials(c.nome)}</div>
+            <div><div class="pname">${c.nome}</div><div class="prole">${c.cargo}</div></div>
+          </div>
+          <div class="drow"><span class="drow-label">Salário bruto</span><span class="drow-val">${fmt(bruto)}</span></div>
+          <div class="drow"><span class="drow-label">Vales (${mesNomeCurto(mesAtual)})</span><span class="drow-val neg">- ${fmt(totalVales)}</span></div>
+          <div class="divider"></div>
+          <div class="drow"><span class="drow-label">Líquido estimado</span><span class="drow-val liq">${fmt(liq)}</span></div>
+          ${salHist?.obs ? `<span class="obs-tag">${salHist.obs}</span>` : ''}
+        </div>`;
+      }).join('')}`;
+  } catch(err) {
+    panel.innerHTML = `<div class="error-banner">Erro: ${err.message}</div>`;
+  }
+}
+
+// ── VALES ──────────────────────────────────────────────────────
+async function renderVales() {
+  const panel = document.getElementById('panel-sal-vales');
+  if (!panel) return;
+  panel.innerHTML = `<div class="loading"><div class="spinner"></div><span class="loading-text">Carregando vales...</span></div>`;
+  try {
+    const mesAtual = mesOf(hoje());
+    const vales = await apiGet('getVales', { mes_ano: mesAtual });
+    // Agrupar por colaborador
+    const porColab = {};
+    (vales||[]).forEach(v => {
+      if (!porColab[v.colaborador_nome]) porColab[v.colaborador_nome] = [];
+      porColab[v.colaborador_nome].push(v);
+    });
+    const nomes = Object.keys(porColab);
+
+    panel.innerHTML = `
+      <div class="form-card">
+        <h3>Registrar novo vale</h3>
+        <div class="frow"><label>Colaborador</label>
+          <select id="vale-pessoa">
+            <option value="">Selecione...</option>
+            ${STATE.colaboradores.filter(c=>c.tipo==='clt').map(c=>`<option value="${c.nome}">${c.nome}</option>`).join('')}
+          </select>
+        </div>
+        <div class="frow2">
+          <div class="frow"><label>Data</label><input type="date" id="vale-data" value="${hoje()}"></div>
+          <div class="frow"><label>Valor (R$)</label><input type="number" id="vale-val" placeholder="0"></div>
+        </div>
+        <div class="frow"><label>Produto / Tipo</label><input id="vale-prod" placeholder="PIX, Cerveja, Almoço..."></div>
+        <button class="btn-main" onclick="confirmarValeInline()">Registrar vale</button>
+      </div>
+      <div class="slabel">Vales de ${mesNome(mesAtual)}</div>
+      ${nomes.length ? nomes.map(nome => {
+        const items = porColab[nome];
+        const total = items.reduce((s,v)=>s+(Number(v.valor)||0),0);
+        const openId = 'vo-' + nome.replace(/\s/g,'_');
+        return `<div class="vale-card">
+          <div class="vale-header" onclick="document.getElementById('${openId}').classList.toggle('open')">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="av g">${initials(nome)}</div>
+              <div><div class="pname">${nome}</div><div class="prole">${items.length} item${items.length!==1?'s':''}</div></div>
+            </div>
+            <span class="vale-total-tag">- ${fmt(total)}</span>
+          </div>
+          <div class="vale-body" id="${openId}">
+            ${items.map(v=>`<div class="vale-item"><span class="vale-data">${v.data}</span><span class="vale-desc">${v.produto}</span><span class="vale-val">- ${fmt(v.valor)}</span></div>`).join('')}
+          </div>
+        </div>`;
+      }).join('') : '<p class="empty">Nenhum vale registrado neste mês.</p>'}`;
+  } catch(err) {
+    panel.innerHTML = `<div class="error-banner">Erro: ${err.message}</div>`;
+  }
+}
+
+function abrirModalVale() { document.getElementById('modal-vale').classList.add('open'); }
+
+async function confirmarValeInline() { await _salvarVale(false); }
+async function confirmarVale()       { await _salvarVale(true); }
+
+async function _salvarVale(fecharModalApos) {
+  const nome = document.getElementById('vale-pessoa')?.value;
+  const data = document.getElementById('vale-data')?.value || hoje();
+  const val  = parseFloat(document.getElementById('vale-val')?.value) || 0;
+  const prod = document.getElementById('vale-prod')?.value?.trim();
+  if (!nome || !val || !prod) { showToast('Preencha todos os campos', 'erro'); return; }
+  setSaving(true);
+  try {
+    await apiPost('salvarVale', { colaborador_nome: nome, mes_ano: mesOf(data), data, produto: prod, valor: val });
+    if (fecharModalApos) fecharModal('modal-vale');
+    renderVales();
+    showToast('Vale registrado!');
+  } catch(err) {
+    showToast('Erro: ' + err.message, 'erro');
+  } finally { setSaving(false); }
+}
+
+// ── INICIAR ───────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>
